@@ -8,10 +8,7 @@
 class Triangle
 {
   private:
-      // Metadata
       int            flatSide;
-//      double         slopes[3];
-//      double         xRankings[3];
       double         yRankings[3];
 
       void           FindVertexRankings();

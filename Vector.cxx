@@ -18,7 +18,6 @@ Vector::Vector(const Vector &v)
    y = v.y;
    z = v.z;
 }
-// MUST be at LEAST 3 deep
 Vector::Vector(double *in) {
    x = in[0];
    y = in[1];

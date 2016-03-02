@@ -43,15 +43,11 @@ GetCamera(int frame, int nframes)
     Vector up(0, 1, 0);
     c.up = up;
 
-    // Set up View Transform
-
     c.vTransform.A[0][0] = 1 / (tan(c.angle/2));
     c.vTransform.A[1][1] = 1 / (tan(c.angle/2));
     c.vTransform.A[2][2] = (c.far+c.near)/(c.far-c.near);
     c.vTransform.A[2][3] = -1;
     c.vTransform.A[3][2] = (2*c.far*c.near)/(c.far-c.near);
-
-    // Set up Camera Transform
 
     Vector v = pos-focus;
 
@@ -59,11 +55,6 @@ GetCamera(int frame, int nframes)
     Vector v2 = v.cross(v1).normalize();
     Vector v3 = v.normalize();
     Vector Origin(0, 0, 0);
-
-    //fprintf(stderr, "Camera Frame:\n");
-    //fprintf(stderr, "\t%s\n\t%s\n\t%s\n", v1.toString(), v2.toString(), v3.toString());
-
-    // Camera Space Transformation
 
     c.camTransform.A[0][0] = v1.x;
     c.camTransform.A[0][1] = v2.x;

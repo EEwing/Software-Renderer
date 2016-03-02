@@ -5,12 +5,6 @@ struct LightingParameters
     LightingParameters(void)
     {
          lightDir = Vector(0.6, 0.0, 0.8);
-/*
-         Ka = 0.3;
-         Kd = 0.7;
-         Ks = 5.3;
-         alpha = 7.5;
-*/
          Ka = 0.3;
          Kd = 0.7;
          Ks = 0.5;

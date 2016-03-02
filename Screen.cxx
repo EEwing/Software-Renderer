@@ -25,13 +25,11 @@ void Screen::SetSize(int w, int h)
       depthMap[i] = -1;
    }
 
-   // Set up Scaling portion
    mTransform.A[0][0] = width/2;
    mTransform.A[1][1] = height/2;
    mTransform.A[2][2] = 1;
    mTransform.A[3][3] = 1;
 
-   // Set up translate portion
    mTransform.A[3][0] = width/2;
    mTransform.A[3][1] = height/2;
 }

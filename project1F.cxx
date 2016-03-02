@@ -2,21 +2,9 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-// Project 1A and 1B
-//#include <vtkDataSet.h>
 #include <vtkImageData.h>
 #include <vtkPNGWriter.h>
-//#include <vtkPointData.h>
 
-// Project 1C
-//#include <vtkPolyData.h>
-//#include <vtkPolyDataReader.h>
-//#include <vtkPoints.h>
-//#include <vtkUnsignedCharArray.h>
-//#include <vtkFloatArray.h>
-//#include <vtkCellArray.h>
-
-//project 1D
 #include "reader1F.h"
 #include "Screen.h"
 #include "Triangle.h"
@@ -25,7 +13,6 @@
 
 #include <limits>
 
-//project 1F
 #include "Camera.h"
 
 #define GET_TIME(now){ \
@@ -99,72 +86,28 @@ int main()
      (unsigned char *) image->GetScalarPointer(0,0,0);
    int npixels = width*height;
 
-   // Initialize values in the buffer to 0
    for (int i = 0 ; i < 3*npixels ; i++) {
       buffer[i] = 1;
    }
 
    std::vector<Triangle> triangles = GetTriangles();
-/*
-   triangles[0].X[0] = 200;
-   triangles[0].X[1] = 800;
-   triangles[0].X[2] = 600;
-
-   triangles[0].Y[0] = 300;
-   triangles[0].Y[1] = 300;
-   triangles[0].Y[2] = 1000;
-   
-   triangles[0].Z[0] = 0;
-   triangles[0].Z[1] = 0;
-   triangles[0].Z[2] = 0;
-
-   triangles[0].colors[0][0] = 0;
-   triangles[0].colors[0][1] = 0;
-   triangles[0].colors[0][2] = 0;
-
-   triangles[0].colors[1][0] = 128;
-   triangles[0].colors[1][1] = 128;
-   triangles[0].colors[1][2] = 128;
-
-   triangles[0].colors[2][0] = 255;
-   triangles[0].colors[2][1] = 255;
-   triangles[0].colors[2][2] = 255;
-*/
 
    Screen screen;
    screen.SetSize(width, height);
    screen.buffer = buffer;
 
-   // YOUR CODE GOES HERE TO DEPOSIT TRIANGLES INTO PIXELS USING THE SCANLINE ALGORITHM
-
-   //int start = 367799;
-   //int start = 359315;
-//   int start = 1522396;
-   //int start = 2522396;
-
    int start = 0;
    int end = triangles.size();
-//   int end = 1;
-//   int start = 40727;
-//   int start = 67728;
-//   int end = start+1;
 
    double nTriangles = end-start;
    fprintf(stderr, "Rendering %d triangles\n", (int)nTriangles);
    LightingParameters lp;
-/*
-   triangles[31107].id = 31107;
-   triangles[31107].render(screen, vAngle, lp);
-   triangles[84199].id = 84199;
-   triangles[84199].render(screen, vAngle, lp);
-*/
    double startTime, endTime;
    GET_TIME(startTime);
    for(int iter=0; iter<1000; iter++) {
 
    fprintf(stderr, "\rRunning iteration %d", iter);
 
-   //Camera cam = GetCamera(iter, 1000);
    Camera cam = GetCamera(iter, 1000);
    screen.Clear();
 
@@ -199,7 +142,6 @@ int main()
    }
 
 
-   //fprintf(stderr, "\n");
    char filename[1024];
    sprintf(filename, "Output/camera_%04d", iter);
    WriteImage(image, filename);

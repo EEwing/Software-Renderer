@@ -206,24 +206,18 @@ void Triangle::SplitAndRender(Screen &screen, Camera vAngle, LightingParameters 
    topTriangle.id = id;
    bottomTriangle.id = id;
 
-   // yRankings[1] is ALWAYS going to be the y value of the top of the bottom tri and the bottom of the top tri
    bottomTriangle.Y[0] = yRankings[1];
    bottomTriangle.Y[1] = yRankings[1];
    topTriangle.Y[0]    = yRankings[1];
    topTriangle.Y[1]    = yRankings[1];
 
-   // yRankings[0] will ALWAYS be the bottom y value for the bottom triangle
    bottomTriangle.Y[2] = yRankings[0];
-   // yRankings[2] will ALWAYS be the top y value for the top triangle
    topTriangle.Y[2]    = yRankings[2];
-
-   // things left to set: all X Values
 
    int topPoint = 0;
    int botPoint = 0;
    int midPoint = 0;
 
-   //Set bottom and top X values
    for(int i=0; i<3; i++) {
       if(Y[i] == yRankings[2]) {
          // top point
@@ -291,51 +285,29 @@ double Triangle::calculateShading(LightingParameters &lp, Camera cam, Vector nor
    Vector nNormal = normal.normalize();
    Vector nLight  = lp.lightDir.normalize();
    Vector nView   = (cam.position-cam.focus).normalize();
-/*
-   fprintf(stderr, "\nnorm: %s\tnormalized: %s\n", normal.toString(), nNormal.toString());
-   fprintf(stderr, "light: %s\tnormalized: %s\n", lp.lightDir.toString(), nLight.toString());
-   fprintf(stderr, "view: %s\tnormalized: %s\n", (cam.position-cam.focus).toString(), nView.toString());
-*/
+
    // Not normalized dependent, gives same result no matter what
    double nDotL = normal.dot(nLight);   
 
    Vector R       = normal * 2 * (nDotL) - nLight;
-   //Vector R       = nNormal * 2 *(nLight.dot(normal)) - lp.lightDir;
    Vector nR      = R.normalize();
 
-   // nLight == light, but nNormal gives rounding errors
    double diffuse = fabs(nDotL);
-   //fprintf(stderr, "%s\t%lf\n", nNormal.toString(), diffuse);
-   //fprintf(stderr, "bef: %s\taft: %s\n", normal.toString(), nNormal.toString());
    // cannot use normalized version of R
    double specular= std::max(0.0, pow(R.dot(nView), lp.alpha));
-   //double specular= std::max(0.0, pow(nR.dot(nView), lp.alpha));
-   //return 1.0;
+
    //return (lp.Ka); /* just ambient */
    //return (lp.Kd * diffuse); /* just diffuse */
-   //return (lp.Kd * diffuse); /* just diffuse */
    //return (lp.Ks * specular); /* just specular */
+
    return (lp.Ka + (lp.Kd * diffuse) + (lp.Ks * specular)); /* all shadings */
 
 }
 
 void Triangle::ConvertToDeviceSpace(Screen &screen, Camera cam) {
 
- //  Print();
-
    Matrix m = Matrix::ComposeMatrices(cam.camTransform, cam.vTransform);
    Matrix finalMatrix = Matrix::ComposeMatrices(m, screen.mTransform);
-
-/*
-   fprintf(stderr, "\nInput matrices\n");
-   mCam.Print(cerr);
-   fprintf(stderr, "\n");
-   mView.Print(cerr);
-   fprintf(stderr, "\n");
-
-   fprintf(stderr, "Total Transform Matrix:\n");
-   finalMatrix.Print(cerr);
-*/
 
    double points[3][4];
    for(int i=0; i<3; i++) {
@@ -347,19 +319,14 @@ void Triangle::ConvertToDeviceSpace(Screen &screen, Camera cam) {
    double finalPoint[4];
    for(int i=0; i<3; i++) {
       finalMatrix.TransformPoint(points[i], finalPoint);
-      //fprintf(stderr, "Transforming from: %f, %f, %f to : ", points[0][0], points[0][1], points[0][2]);
       X[i] = finalPoint[0]/finalPoint[3];
       Y[i] = finalPoint[1]/finalPoint[3];
       Z[i] = finalPoint[2]/finalPoint[3];
-      //fprintf(stderr, "%f, %f, %f\n", X[0], Y[0], Z[0]);
    } 
-
-//   Print();
 
 }
 
 void Triangle::render(Screen &screen, Camera cam, LightingParameters &lp) {
-   //Print();
    if(!isValidTriangle()) {
       return;
    }
@@ -398,8 +365,6 @@ void Triangle::render(Screen &screen, Camera cam, LightingParameters &lp) {
       zMax = interpolate(Y[2], y, Y[1], Z[2], Z[1]);
       Vector normMax = interpolate(Y[2], y, Y[1], normals[2], normals[1]);
 
-      //fprintf(stderr, "\n%s\t\t%s\n", normMin.toString(), normMax.toString());
-
       for(int k=0; k<3; k++) {
          minColor[k] = interpolate(Y[0], y, Y[2], colors[0][k], colors[2][k]);
          maxColor[k] = interpolate(Y[2], y, Y[1], colors[2][k], colors[1][k]);
@@ -418,14 +383,6 @@ void Triangle::render(Screen &screen, Camera cam, LightingParameters &lp) {
          double c[3];
 
          Vector normPoint = interpolate(xMin, x, xMax, normMin, normMax);
-/*
-         fprintf(stderr, "\nBefore Shading (%d, %d):\n", x, y);
-         fprintf(stderr, "Vertex vectors:\n\t%s\n\t%s\n\t%s\n", normals[0].toString(), normals[1].toString(), normals[2].toString());
-         fprintf(stderr, "Left and Right end Vectors\n");
-         fprintf(stderr, "\t%s\n\t%s\n", normMin.toString(), normMax.toString());
-         fprintf(stderr, "Point Norm + normalized:\n");
-         fprintf(stderr, "\t%s\n\t%s\n", normPoint.toString(), normPoint.normalize().toString());
-*/
          double shadingFactor = calculateShading(lp, cam, normPoint);
 
          for(int k=0; k<3; k++) {
@@ -440,7 +397,6 @@ void Triangle::render(Screen &screen, Camera cam, LightingParameters &lp) {
          }
 
          if(zMid > screen.GetDepth(x, y)) {
-            //fprintf(stderr, "Setting pixel @ (%d, %d) (%f, %f, %f)\n", x, y, ceil441(c[0]*255.0), ceil441(c[1]*255.0), ceil441(c[2]*255.0));
             buffer[0] = (unsigned char)(ceil441(c[0]*255.0));
             buffer[1] = (unsigned char)(ceil441(c[1]*255.0));
             buffer[2] = (unsigned char)(ceil441(c[2]*255.0));
@@ -450,63 +406,3 @@ void Triangle::render(Screen &screen, Camera cam, LightingParameters &lp) {
    }
 }
 
-/* Applies a wireframe to the output */
-/*
-         if((x==ceil441(xMin) || x==floor441(xMax) || y==rowMin || y==rowMax) && zMid > screen.GetDepth(x, y)) {
-            for(int j=0; j<3; j++) {
-               buffer[j] = (unsigned char) 0;
-            }
-            screen.SetDepth(x, y, zMid);
-            continue;
-         }
-*/
-
-/* Single out color channels one at a time */
-/*
-         if(zMid > screen.GetDepth(x, y)) {
-//  RED CHANNEL
-            buffer[0] = (unsigned char) (c[0]*255.0);
-//  GREEN CHANNEL
-            buffer[1] = (unsigned char) (c[1]*255.0);
-//  BLUE CHANNEL
-//            buffer[2] = (unsigned char) (c[2]*255.0);
-            screen.SetDepth(x, y, zMid);
-         }
-         continue;
-*/
-
-/* Renders the image in a backward direction, as if the camera were on the other side */
-/*
-         if(zMid > screen.GetDepth(screen.GetWidth()-x, y)) {
-            unsigned char * buffer2 = screen.GetPixel(screen.GetWidth()-x, y);
-            for(int j=0; j<3; j++) {
-               buffer2[j] = (unsigned char)(ceil441(c[j]*255.0));
-            }
-            screen.SetDepth(screen.GetWidth()-x, y, -1.0 -zMid);
-         }
-         continue;
-*/
-
-/*      Applies a depth map coloring scheme to the output     */
-/* Colors range from black = foreground to white = background */
-/*
-         if(zMid > screen.GetDepth(x, y)) {
-            for( int j=0; j<3; j++) {
-               buffer[j] = (unsigned char) (zMid * -255.0);
-               screen.SetDepth(x, y, zMid);
-            }
-         }
-         continue;
-*/
-   
-
-         //fprintf(stderr, "Color = %f, %f, %f\n", c[0], c[1], c[2]);
-         //cerr << "Color = " << c[0] << ", " << c[1] << ", " << c[2] << endl;
-
-
-/*
-         if ( (880 < x) && (x < 890) && (0 < y) && (y < 10) ) {
-             fprintf(stderr, "%d\n", id);
-             break;
-         }
-*/

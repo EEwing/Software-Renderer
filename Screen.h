@@ -23,6 +23,5 @@ class Screen
       void            SetDepth(int, int, double);
 
       void            Clear();
-  // would some methods for accessing and setting pixels be helpful?
 };
 #endif

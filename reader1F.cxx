@@ -25,20 +25,12 @@ GetTriangles(void)
         exit(EXIT_FAILURE);
     }
     vtkPolyData *pd = rdr->GetOutput();
-/*
-vtkDataSetWriter *writer = vtkDataSetWriter::New();
-writer->SetInput(pd);
-writer->SetFileName("hrc.vtk");
-writer->Write();
- */
 
     int numTris = pd->GetNumberOfCells();
     vtkPoints *pts = pd->GetPoints();
     vtkCellArray *cells = pd->GetPolys();
     vtkDoubleArray *var = (vtkDoubleArray *) pd->GetPointData()->GetArray("hardyglobal");
     double *color_ptr = var->GetPointer(0);
-    //vtkFloatArray *var = (vtkFloatArray *) pd->GetPointData()->GetArray("hardyglobal");
-    //float *color_ptr = var->GetPointer(0);
     vtkFloatArray *n = (vtkFloatArray *) pd->GetPointData()->GetNormals();
     float *normals = n->GetPointer(0);
     std::vector<Triangle> tris(numTris);
@@ -59,27 +51,18 @@ writer->Write();
         tris[idx].Z[0] = pt[2];
         Vector v1(normals[3*ptIds[0]+0], normals[3*ptIds[0]+1], normals[3*ptIds[0]+2]);
         tris[idx].normals[0] = v1;
-        //tris[idx].normals[0][0] = normals[3*ptIds[0]+0];
-        //tris[idx].normals[0][1] = normals[3*ptIds[0]+1];
-        //tris[idx].normals[0][2] = normals[3*ptIds[0]+2];
         pt = pts->GetPoint(ptIds[1]);
         tris[idx].X[1] = pt[0];
         tris[idx].Y[1] = pt[1];
         tris[idx].Z[1] = pt[2];
         Vector v2(normals[3*ptIds[1]+0], normals[3*ptIds[1]+1], normals[3*ptIds[1]+2]);
         tris[idx].normals[1] = v2;
-        //tris[idx].normals[1][0] = normals[3*ptIds[1]+0];
-        //tris[idx].normals[1][1] = normals[3*ptIds[1]+1];
-        //tris[idx].normals[1][2] = normals[3*ptIds[1]+2];
         pt = pts->GetPoint(ptIds[2]);
         tris[idx].X[2] = pt[0];
         tris[idx].Y[2] = pt[1];
         tris[idx].Z[2] = pt[2];
         Vector v3(normals[3*ptIds[2]+0], normals[3*ptIds[2]+1], normals[3*ptIds[2]+2]);
         tris[idx].normals[2] = v3;
-        //tris[idx].normals[2][0] = normals[3*ptIds[2]+0];
-        //tris[idx].normals[2][1] = normals[3*ptIds[2]+1];
-        //tris[idx].normals[2][2] = normals[3*ptIds[2]+2];
 
         // 1->2 interpolate between light blue, dark blue
         // 2->2.5 interpolate between dark blue, cyan
